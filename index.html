@@ -1,0 +1,660 @@
+<style>
+:root{
+  --paper:#faf9f6; --ink:#15151a; --ink-soft:#5b5f66;
+  --red:#d7261e; --red-ink:#ffffff; --red-tint:#f5dcd9;
+  --focus:#1c4fd9; --line:#15151a; --line-soft:#dcd8cd;
+  --surface:#ffffff; --surface-alt:#efece1;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#121214; --ink:#f2f0e8; --ink-soft:#a7abb2;
+    --red:#ff5447; --red-ink:#1a0603; --red-tint:#3a1613;
+    --focus:#7fa6ff; --line:#f2f0e8; --line-soft:#333339;
+    --surface:#1a1a1d; --surface-alt:#202024;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#121214; --ink:#f2f0e8; --ink-soft:#a7abb2;
+  --red:#ff5447; --red-ink:#1a0603; --red-tint:#3a1613;
+  --focus:#7fa6ff; --line:#f2f0e8; --line-soft:#333339;
+  --surface:#1a1a1d; --surface-alt:#202024;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Helvetica Neue",Helvetica,Arial,"Liberation Sans",sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--focus); text-decoration-thickness:1px;}
+a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--focus); outline-offset:2px;}
+.wrap{max-width:1180px; margin:0 auto; padding:0 20px;}
+h1,h2,h3{text-wrap:balance; margin:0; font-weight:700;}
+p{line-height:1.55; margin:0 0 .9em;}
+.eyebrow{font-size:.72rem; letter-spacing:.11em; text-transform:uppercase; color:var(--red); font-weight:700;}
+.soft{color:var(--ink-soft);}
+table{border-collapse:collapse; width:100%; font-size:.92rem;}
+th{text-align:left; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); font-weight:700; padding:8px 14px 8px 0; border-bottom:2px solid var(--line);}
+td{padding:11px 14px 11px 0; border-bottom:1px solid var(--line-soft); vertical-align:top;}
+td.num,th.num{font-variant-numeric:tabular-nums;}
+.tablewrap{overflow-x:auto; border-top:0;}
+
+/* ===== MASTHEAD ===== */
+.masthead{border-bottom:4px solid var(--line); padding:38px 0 26px;}
+.masthead .kicker{font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:10px;}
+.masthead h1{font-size:clamp(2.6rem,7vw,5.2rem); line-height:.96; letter-spacing:-.01em;}
+.masthead h1 span{color:var(--red);}
+.masthead .dek{max-width:44ch; margin-top:16px; font-size:1.05rem; color:var(--ink-soft);}
+
+/* ===== NAV ===== */
+nav.index{position:sticky; top:0; background:var(--paper); z-index:20; border-bottom:2px solid var(--line);}
+nav.index .wrap{display:flex; overflow-x:auto; gap:0;}
+nav.index button{
+  flex:0 0 auto; background:none; border:none; cursor:pointer;
+  font-family:inherit; color:var(--ink); padding:14px 18px 11px;
+  font-size:.78rem; letter-spacing:.07em; text-transform:uppercase; font-weight:700;
+  border-bottom:3px solid transparent; white-space:nowrap;
+}
+nav.index button .n{color:var(--ink-soft); margin-right:8px; font-variant-numeric:tabular-nums;}
+nav.index button[aria-current="true"]{border-bottom-color:var(--red); color:var(--red);}
+nav.index button[aria-current="true"] .n{color:var(--red);}
+nav.index button:hover{color:var(--red);}
+
+main{padding:44px 0 90px;}
+.page{display:none;}
+.page.active{display:block;}
+section+section{margin-top:52px;}
+.rule{height:2px; background:var(--line); border:none; margin:28px 0;}
+.rule.soft{height:1px; background:var(--line-soft);}
+
+/* ===== GRID / CARDS ===== */
+.cols{display:grid; gap:28px;}
+.cols.c2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));}
+.cols.c3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
+.card{border-top:2px solid var(--line); padding-top:16px;}
+.flag{background:var(--red-tint); border-left:4px solid var(--red); padding:14px 18px; margin:18px 0;}
+.flag .eyebrow{margin-bottom:6px;}
+.pagehead{margin-bottom:30px;}
+.pagehead h2{font-size:clamp(1.8rem,4vw,2.5rem);}
+.pagehead .eyebrow{margin-bottom:8px;}
+.tag{display:inline-block; font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; font-weight:700; padding:2px 8px; border:1px solid var(--line); margin-right:6px;}
+.tag.mand{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+.tag.elec{color:var(--ink-soft); border-color:var(--line-soft);}
+.tag.urgent{background:var(--red); color:var(--red-ink); border-color:var(--red);}
+
+/* ===== TIMELINE (PLAN PAGE) ===== */
+.deadline-row{display:grid; grid-template-columns:120px 1fr; gap:18px; padding:16px 0; border-bottom:1px solid var(--line-soft); align-items:baseline;}
+.deadline-row .date{font-size:1.25rem; font-weight:700; font-variant-numeric:tabular-nums;}
+.deadline-row .date .yr{color:var(--ink-soft); font-size:.8rem; font-weight:400; display:block;}
+.deadline-row h3{font-size:1.02rem; margin-bottom:4px;}
+.deadline-row:first-child{border-top:2px solid var(--line);}
+
+.checklist{list-style:none; margin:0; padding:0;}
+.checklist li{display:grid; grid-template-columns:26px 1fr; gap:12px; padding:10px 0; border-bottom:1px solid var(--line-soft);}
+.checklist li .box{width:16px; height:16px; border:2px solid var(--ink); margin-top:3px;}
+.checklist li b{display:block;}
+
+.phase{display:grid; grid-template-columns:64px 1fr; gap:16px; padding:18px 0; border-bottom:1px solid var(--line-soft);}
+.phase .when{font-size:.74rem; letter-spacing:.06em; text-transform:uppercase; color:var(--red); font-weight:700; padding-top:3px;}
+
+/* ===== PROGRAM TABS WITHIN SCHOOL PAGE ===== */
+.progtabs{display:flex; flex-wrap:wrap; gap:8px; margin:22px 0 24px;}
+.progtabs button{
+  font-family:inherit; background:var(--surface-alt); border:1px solid var(--line-soft); color:var(--ink);
+  padding:8px 14px; font-size:.82rem; font-weight:700; cursor:pointer;
+}
+.progtabs button[aria-current="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+.progpanel{display:none;}
+.progpanel.active{display:block;}
+
+.schoolhead{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; border-bottom:4px solid var(--line); padding-bottom:18px;}
+.schoolhead h2{font-size:clamp(2rem,5vw,3.2rem); line-height:1;}
+.schoolhead .meta{text-align:right; font-size:.82rem; color:var(--ink-soft);}
+.schoolhead .meta a{color:var(--ink); font-weight:700;}
+
+.statgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px; background:var(--line-soft); margin:24px 0;}
+.statgrid .stat{background:var(--surface); padding:16px 18px;}
+.statgrid .stat .v{font-size:1.4rem; font-weight:700; font-variant-numeric:tabular-nums;}
+.statgrid .stat .k{font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); margin-top:3px;}
+
+.srcitem{padding:12px 0; border-bottom:1px solid var(--line-soft);}
+.srcitem .plat{font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; color:var(--red); font-weight:700;}
+
+.coursegroup h4{font-size:.95rem; margin:22px 0 10px; border-bottom:1px solid var(--line-soft); padding-bottom:6px;}
+.courserow{display:grid; grid-template-columns:1fr; gap:3px; padding:9px 0; border-bottom:1px solid var(--line-soft); font-size:.88rem;}
+.courserow .cname{font-weight:700;}
+.courserow .cname .tag{transform:translateY(-1px);}
+.courserow .cdesc{color:var(--ink-soft);}
+details.curric summary{cursor:pointer; font-weight:700; font-size:.88rem; padding:10px 0; list-style:none;}
+details.curric summary::before{content:"+ "; color:var(--red);}
+details.curric[open] summary::before{content:"\2212 ";}
+details.curric summary::-webkit-details-marker{display:none;}
+
+footer{border-top:2px solid var(--line); padding:26px 0 60px;}
+footer p{font-size:.82rem; color:var(--ink-soft); max-width:60ch;}
+
+@media (prefers-reduced-motion: no-preference){
+  .page.active{animation:fade .18s ease-out;}
+  @keyframes fade{from{opacity:0;} to{opacity:1;}}
+}
+</style>
+
+<nav class="index" aria-label="Sections">
+  <div class="wrap">
+    <button data-page="plan" aria-current="true"><span class="n">00</span>Plan</button>
+    <button data-page="compare"><span class="n">01</span>Compare</button>
+    <button data-page="mtm"><span class="n">02</span>MTM College</button>
+    <button data-page="ocad"><span class="n">03</span>OCAD</button>
+    <button data-page="seneca"><span class="n">04</span>Seneca</button>
+    <button data-page="centennial"><span class="n">05</span>Centennial</button>
+    <button data-page="sheridan"><span class="n">06</span>Sheridan</button>
+    <button data-page="tfs"><span class="n">07</span>Toronto Film School</button>
+  </div>
+</nav>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="kicker">Six schools · Fall 2027 intake · Toronto</div>
+    <h1>Portfolio<br><span>Season.</span></h1>
+    <p class="dek">Everything you need to apply to animation, character design, and concept-art programs across OCAD, Sheridan, Seneca, MTM College (Max the Mutt), Centennial, and Toronto Film School — ordered by what's due first, not by name.</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ============ PLAN ============ -->
+<div class="page active" id="page-plan">
+  <div class="pagehead">
+    <div class="eyebrow">00 — The Plan</div>
+    <h2>Start with the deadline, not the school.</h2>
+  </div>
+
+  <p>MTM College's preferred deadline lands first — mid-December, about two months out from today. Everything else follows from that. Build the drawings nearly every school wants before touching anything school-specific, then layer on the extras as each deadline approaches.</p>
+
+  <div class="rule"></div>
+
+  <section>
+    <div class="eyebrow">Deadlines, in order</div>
+    <div class="deadline-row">
+      <div class="date">Dec 20<span class="yr">2026 — preferred</span></div>
+      <div><h3>MTM College (Max the Mutt)</h3><p class="soft">All three diplomas. The site still shows "still accepting for Fall 2026," so this probably isn't a hard wall — but don't test that on purpose.</p></div>
+    </div>
+    <div class="deadline-row">
+      <div class="date">Jan 15 <span class="yr">2027</span></div>
+      <div><h3>OCAD — application (Ontario high-school students)</h3><p class="soft">Everyone else gets until Feb 1. Portfolio itself isn't due until Feb 10.</p></div>
+    </div>
+    <div class="deadline-row">
+      <div class="date">Feb 1 <span class="yr">2027</span></div>
+      <div><h3>Equal consideration — Seneca, Centennial, Sheridan, OCAD</h3><p class="soft">The province-wide ontariocolleges.ca cutoff. Apply after this and you're still in, just reviewed first-come-first-served as seats fill.</p></div>
+    </div>
+    <div class="deadline-row">
+      <div class="date">Feb 10 <span class="yr">2027</span></div>
+      <div><h3>OCAD — portfolio</h3><p class="soft">Same date for every OCAD program; not school-specific.</p></div>
+    </div>
+    <div class="deadline-row">
+      <div class="date">~Feb 19 <span class="yr">2027 — unconfirmed</span></div>
+      <div><h3>Sheridan — portfolio (Animation / Illustration)</h3><p class="soft">Last cycle's date was Feb 19–20, 2026. Sheridan hadn't posted the 2027 figure as of this research — it shows up on the Applicant Portal after you apply.</p></div>
+    </div>
+    <div class="deadline-row">
+      <div class="date">—</div>
+      <div><h3>Seneca &amp; Centennial — portfolio</h3><p class="soft">No fixed date. You apply, they invite you, you book a session. Could land anywhere between November and February.</p></div>
+    </div>
+    <div class="deadline-row">
+      <div class="date">Rolling</div>
+      <div><h3>Toronto Film School</h3><p class="soft">No academic calendar at all — the lowest-effort safety net on the list, not a priority.</p></div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section>
+    <div class="eyebrow">Build this first — it covers five of six schools</div>
+    <p>A set of roughly twenty pieces built around seven categories covers almost every requirement below. Everything school-specific is an addition to this set, not a separate portfolio.</p>
+    <ol class="checklist">
+      <li><div class="box"></div><div><b>Life drawing from observation — 5 to 6 pieces</b><span class="soft">Standing and seated poses, quick gesture studies, clothed and un-clothed. Wanted everywhere.</span></div></li>
+      <li><div class="box"></div><div><b>Object / still-life drawing — 2 to 3 pieces</b><span class="soft">Different objects, different viewpoints, real light. OCAD, Seneca, MTM, Sheridan all ask for this directly.</span></div></li>
+      <li><div class="box"></div><div><b>Perspective drawing — 2 pieces, one interior, one exterior</b><span class="soft">Two-point perspective, a real or imagined room and a real or imagined exterior.</span></div></li>
+      <li><div class="box"></div><div><b>An original character, fully developed — the centrepiece</b><span class="soft">Front / ¾ / profile / back rotation, props, a clear silhouette. This is the single highest-value piece for "character design" — give it the most hours.</span></div></li>
+      <li><div class="box"></div><div><b>A storyboard or short comic sequence</b><span class="soft">8–12 panels telling one small story, ideally starring the character above.</span></div></li>
+      <li><div class="box"></div><div><b>A real sketchbook, kept messy on purpose</b><span class="soft">Every school wants to see actual process pages, not a cleaned-up imitation of one. Start filling it now if it isn't already underway.</span></div></li>
+      <li><div class="box"></div><div><b>4–6 personal pieces, any medium</b><span class="soft">Paintings, digital art, a comic page, a demo reel clip, photography — whatever shows range beyond the assignments above.</span></div></li>
+    </ol>
+  </section>
+
+  <div class="rule"></div>
+
+  <section>
+    <div class="eyebrow">Then, in order</div>
+    <div class="phase"><div class="when">Phase 0<br>~1 wk</div><div><h3>Narrow the list and close the open questions</h3><p>Six schools is a lot for one portfolio season. Decide which programs are real contenders before you spend sixty hours on all of them. At the same time, email the three admissions offices about the open questions — Seneca's Illustration piece count (their own pages disagree: 5 or 10), Sheridan's unpublished 3D Animation spec, and MTM's exact submission method.</p></div></div>
+    <div class="phase"><div class="when">Phase 1<br>Nov</div><div><h3>The universal core</h3><p>Life drawing, object drawing, perspective drawing. No deadline risk yet — this is just skill-building that every later piece depends on.</p></div></div>
+    <div class="phase"><div class="when">Phase 2<br>Nov – early Dec</div><div><h3>The character</h3><p>Full rotation, props, a clear design. Most time-consuming piece on the list — start it early specifically because MTM's deadline is in December, not February.</p></div></div>
+    <div class="phase"><div class="when">Phase 3<br>Dec</div><div><h3>Storyboard, personal pieces, submit MTM</h3><p>Finish the storyboard, pull the sketchbook selection together, round out the personal-work pieces. Submit MTM College by Dec 20.</p></div></div>
+    <div class="phase"><div class="when">Phase 4<br>Jan</div><div><h3>School-specific extras</h3><p>Sheridan's animation exercise and second perspective piece if Animation is a target; OCAD's statement of intent; whatever Seneca and Sheridan have published by now.</p></div></div>
+    <div class="phase"><div class="when">Phase 5<br>Early Feb</div><div><h3>Submit everything else</h3><p>OCAD (portfolio due the 10th), Sheridan, and the ontariocolleges.ca applications for Seneca and Centennial (equal consideration the 1st). Toronto Film School stays in reserve — three pieces is nothing next to what's already been built.</p></div></div>
+  </section>
+</div>
+
+<!-- ============ COMPARE ============ -->
+<div class="page" id="page-compare">
+  <div class="pagehead">
+    <div class="eyebrow">01 — Side by Side</div>
+    <h2>What each program actually asks for.</h2>
+  </div>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>School</th><th>Program</th><th>Pieces</th><th>Made in</th><th>Submitted via</th><th>Core content</th><th>Due</th></tr></thead>
+    <tbody>
+      <tr><td><b>MTM College</b></td><td>Animation</td><td class="num">~14 +5 sketchbook</td><td>Traditional or digital, your call</td><td>Email to admissions — exact method not published, ask directly</td><td>Life/object/perspective drawing, character + rotation, storyboard, bouncing-ball animation</td><td><b>Dec 20 '26</b></td></tr>
+      <tr><td><b>MTM College</b></td><td>Concept Art</td><td class="num">~12 +5</td><td>Traditional or digital, your call</td><td>Email to admissions — same caveat</td><td>Same fundamentals, character + finished illustration + environment</td><td><b>Dec 20 '26</b></td></tr>
+      <tr><td><b>MTM College</b></td><td>Illustration / Sequential Arts</td><td class="num">~14 +5</td><td>Traditional or digital, your call</td><td>Email to admissions — same caveat</td><td>Same fundamentals, personal comic page + one drawn from a provided script (pencils only)</td><td><b>Dec 20 '26</b></td></tr>
+      <tr><td><b>OCAD</b></td><td>Illustration</td><td class="num">8–10 +sketchbook</td><td>Traditional or digital, your call</td><td>SlideRoom upload — jpg/png/gif/mp4/PDF, no physical option</td><td>Observational drawing, variety of media; anime/Disney-style work actively marked down</td><td>Feb 10 '27</td></tr>
+      <tr><td><b>OCAD</b></td><td>Exp. Animation / Drawing &amp; Painting / Integrated Media / Digital Futures</td><td class="num">8–10</td><td>Traditional or digital</td><td>SlideRoom upload, same as Illustration</td><td>Same shared OCAD framework, no program-specific spec published</td><td>Feb 10 '27</td></tr>
+      <tr><td><b>Seneca</b></td><td>Animation</td><td class="num">5</td><td>Traditional or digital</td><td>SlideRoom — one PDF</td><td>Full-body life drawing, hand study, object, 2-pt perspective room, free choice</td><td>Not fixed</td></tr>
+      <tr><td><b>Seneca</b></td><td>Illustration</td><td class="num">5 <i>or</i> 10</td><td>Traditional or digital (pencil/ink specified for some pieces)</td><td>SlideRoom — one PDF</td><td>Seneca's own pages disagree on count — call and ask which</td><td>Not fixed</td></tr>
+      <tr><td><b>Centennial</b></td><td>Game – Art</td><td class="num">10–15</td><td>Mix expected — ~5 pieces must be made in Maya/3ds Max/ZBrush/Photoshop</td><td>Digital PDF or portfolio link beforehand, <b>plus a physical copy brought to the Admission Session</b></td><td>~5 digital pieces, colour studies, perspective, figure drawing</td><td>Not fixed</td></tr>
+      <tr><td><b>Sheridan</b></td><td>Animation</td><td class="num">4 drawings +rotation +anim. +storyboard +15 sketchbook +4–6</td><td>Mostly either — the 4 observational drawings must be made traditionally</td><td>Sheridan's own online portal — explicitly "no mailed-in portfolios"</td><td>Heaviest, most structured ask on this list. Zero tolerance for AI.</td><td>~Feb 19 '27*</td></tr>
+      <tr><td><b>Sheridan</b></td><td>Illustration</td><td class="num">Timed test +10–15 +15–25 sketchbook</td><td>Mostly traditional — max 2 of the 10–15 pieces may be digital</td><td>Sheridan's own online portal</td><td>70% of score is a supervised drawing test, not a take-home portfolio</td><td>~Feb 20 '27*</td></tr>
+      <tr><td><b>Toronto Film School</b></td><td>Game Design &amp; Animation</td><td class="num">3 minimum</td><td>Any mix — sketches, 3D models, digital art, animation, game assets</td><td>Uploaded through the online application</td><td>Or a 2–3 page game design document, or both — lowest bar here by far</td><td>Rolling</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="soft" style="margin-top:14px;">*Last cycle's date — Sheridan posts the current one to the Applicant Portal after you apply. Seneca and Centennial portfolios are booked individually after an invitation, not submitted to a fixed date.</p>
+
+  <div class="rule"></div>
+
+  <section>
+    <div class="eyebrow">"Made in" vs. "Submitted via" — why those are two different columns</div>
+    <p>"Format" used to mean two different things at once: what the artwork is physically made of, and how it reaches the school. Split apart, the pattern is simple — <b>almost everything can be made in pencil, paint, clay, or a tablet, your choice</b>, with a couple of named exceptions (Sheridan's four observational drawings and its Drawing Test must be done traditionally; Centennial expects real software fluency in about five pieces). But <b>submission is digital everywhere</b>. Nobody on this list accepts a mailed-in physical portfolio. The one partial exception is Centennial, which wants a digital copy ahead of time <i>and</i> a physical copy in hand at the actual Admission Session — because that's a real meeting, not a drop-off.</p>
+    <p>So if a piece is made on paper or in clay: you photograph or scan it, once, well — flat, even light, no glare, cropped tight — and that photo or scan <i>is</i> the submission. A piece made digitally in Procreate or Photoshop just gets exported. Either way, what lands in the portal is a file.</p>
+  </section>
+
+  <section>
+    <div class="eyebrow">One piece, six applications</div>
+    <p>Because every school takes files, not objects, the same piece can go everywhere that asks for its category. Make the life drawing once, scan it once at good resolution, and that single image file gets uploaded to Seneca's SlideRoom, OCAD's SlideRoom, Sheridan's portal, MTM's email, and Centennial's PDF — no re-drawing, no re-shipping. Two things actually change per school, not the artwork itself:</p>
+    <ul class="checklist">
+      <li><div class="box"></div><div><b>File specs</b><span class="soft">Check each portal's accepted formats and size limits before the deadline — OCAD names exact formats (jpg/png/gif/mp4/PDF); Seneca and Sheridan both want everything compiled into one PDF rather than separate images.</span></div></li>
+      <li><div class="box"></div><div><b>Medium restrictions</b><span class="soft">Don't send Sheridan a digital version of a piece it specifically wants traditional, and keep Centennial's software-made pieces actually made in that software — otherwise the same files travel to every school on the list.</span></div></li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="eyebrow">A sketchbook that can actually be uploaded</div>
+    <p>"Keep a messy, real sketchbook" and "submit everything as a file" aren't in tension — there are two legitimate ways to get there:</p>
+    <ul class="checklist">
+      <li><div class="box"></div><div><b>Paper sketchbook, scanned after the fact</b><span class="soft">Draw normally. When it's time to submit, photograph each page flat under even light (daylight from a window beats a lamp) or run it through a flatbed scanner, then merge the images into one PDF in page order. A phone scanning app — Adobe Scan, the iPhone Notes scanner, CamScanner — straightens and crops each page automatically; it's faster than it sounds.</span></div></li>
+      <li><div class="box"></div><div><b>A sketchbook that's digital from the start</b><span class="soft">Draw directly in an app on a tablet — Procreate, Clip Studio Paint, Photoshop, or the free option Krita. Every page is already a file; export each as a JPG or PNG at a consistent size and drop them into one PDF.</span></div></li>
+    </ul>
+    <p class="soft">No school on this list requires the sketchbook to be physical. What reviewers are actually checking for is whether the pages read as real, unforced process — thumbnails, false starts, studies — not whether it was made with a pencil or a stylus.</p>
+  </section>
+</div>
+
+<!-- ============ SCHOOL PAGES (rendered by JS) ============ -->
+<div class="page" id="page-mtm"></div>
+<div class="page" id="page-ocad"></div>
+<div class="page" id="page-seneca"></div>
+<div class="page" id="page-centennial"></div>
+<div class="page" id="page-sheridan"></div>
+<div class="page" id="page-tfs"></div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><b>On accuracy:</b> admissions pages change every year. Everything here was checked on October 18, 2026 against each school's own site, with ontariocolleges.ca for the application-fee and equal-consideration dates. Anything marked "not fixed," "unconfirmed," or carrying an asterisk is exactly that — worth a direct call before you build a deadline around it. Acceptance-rate numbers circulating online (Reddit, aggregator sites) could rarely be traced to an actual source and are treated here as rumour, not fact.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- navigation ---------- */
+  var navButtons = document.querySelectorAll('nav.index button');
+  var pages = document.querySelectorAll('.page');
+  function go(id){
+    pages.forEach(function(p){ p.classList.toggle('active', p.id === 'page-'+id); });
+    navButtons.forEach(function(b){ b.setAttribute('aria-current', b.dataset.page===id ? 'true':'false'); });
+    if(history.replaceState){ history.replaceState(null,'','#'+id); }
+    window.scrollTo({top:0, behavior:'auto'});
+  }
+  navButtons.forEach(function(b){ b.addEventListener('click', function(){ go(b.dataset.page); }); });
+  var startId = (location.hash||'').replace('#','');
+  if(!document.getElementById('page-'+startId)) startId = 'plan';
+  go(startId);
+
+  /* ---------- helpers ---------- */
+  function el(tag, cls, html){ var e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; }
+  function tagHtml(type){ return '<span class="tag '+(type==='M'?'mand':'elec')+'">'+(type==='M'?'Mandatory':'Elective')+'</span>'; }
+
+  /* ---------- school data ---------- */
+  var SCHOOLS = [
+  {
+    id:'mtm', name:'MTM College', sub:'formerly Max the Mutt', site:'https://mtmcollege.ca',
+    flag:'Operates today as <b>MTM College</b> at mtmcollege.ca — the old maxthemutt.com address is dead. Bought in 2022 by Visionary/Farvision Education. The 2025-26 Viewbook also teases new 2-year diploma versions of every program "pending approval" under Ontario\'s Private Career College Act — ask admissions whether Fall 2027 still means the 4-year diploma documented below.',
+    stats:[['Dec 20 \'26','Preferred deadline'],['$75','Application fee'],['$12,500/yr','Domestic tuition'],['260 Spadina Ave','Toronto campus']],
+    programs:[
+      {
+        name:'Animation Diploma', credential:'4-year diploma',
+        portfolio:['2 figure drawings (online reference OK)','1 object drawing, from life','5 life drawings — people and animals','1 perspective drawing, interior or exterior','Character design: 1 original character + props + a full rotation','1 storyboard, 4+ panels, starring that character','1 bouncing-ball animation','5+ sketchbook / assorted personal pieces'],
+        portfolioNote:'No stated restriction on traditional vs. digital. Submission method isn\'t published — you email admissions once your set is ready.',
+        academic:'Transcripts plus a personal statement (350 words or a 2-minute video). No published minimum grade — MTM reviews holistically.',
+        curriculumSummary:'Four years, eight terms, every course mandatory — nothing here is an elective. Year 1 is pure fundamentals: life drawing, perspective, design &amp; composition, and a first pass at character design and traditional 12-principles animation. Year 2 adds storyboarding, film language, anatomy, and the first digital tools (2D software, then a first look at 3D). Year 3 moves into sustained character animation and a two-term 2D film project, with 3D pre-production starting alongside it. Year 4 is almost entirely 3D production, closing with a dedicated portfolio-development term.',
+        curriculumNote:'MTM doesn\'t publish course descriptions anywhere public — the course list below is real, confirmed titles; the one-line summaries are reasonable guesses from the title and sequence, not official text.',
+        terms:[
+          {label:'Year 1', courses:[['Beginning Life Drawing 1','M','Gesture and proportion from a live model.'],['Perspective 1','M','One- and two-point perspective construction.'],['Design & Composition','M','Visual-design fundamentals: balance, shape, focal point.'],['Principles of Drawing 1','M','Line, form, and shading basics.'],['Animation 1','M','The 12 classic principles, hand-drawn.'],['Colour Theory & Background Painting','M','Hue, value, and harmony applied to backgrounds.'],['Beginning Life Drawing 2','M','Longer, more complex poses.'],['Perspective 2','M','Multi-point and interior/exterior problems.'],['Structural Drawing 1','M','Building forms from underlying geometry.'],['Principles of Drawing 2','M','Continued foundational drawing.'],['Intro to Character Design','M','Shape language and silhouette for original characters.'],['Animation 1B','M','Walk cycles, weight, timing.'],['Digital Background Painting','M','Digital-painting tools applied to backgrounds.']]},
+          {label:'Year 2', courses:[['Intro to Storyboarding & Film Language','M','Shot composition, framing, continuity.'],['Storytelling & Story Development','M','Narrative structure for short films.'],['Intermediate Life Drawing 1','M','More dynamic poses, deeper anatomy.'],['Artistic Anatomy','M','Skeleton and muscle for figure drawing.'],['Animation 2','M','More complex acting and movement.'],['Intermediate Character Design','M','Turnarounds and expression sheets.'],['2D Computer Animation: Introduction','M','Digital 2D animation software and workflow.'],['Introduction to 3D Animation Software','M','First look at a 3D package.'],['Intermediate Life Drawing 2','M','Continued, longer studies.'],['Drawing Hands & Feet','M','Focused construction practice.'],['Drawing Heads & Features','M','Facial construction from observation.'],['Advanced Character Design','M','Full casts, costume, props.'],['Animation 2B','M','A complete acting assignment.'],['Layout for Animation 1','M','Staging, camera angle, scene composition.'],['Storyboarding 1','M','Full storyboard sequences.']]},
+          {label:'Year 3', courses:[['Advanced Life Drawing 1','M','Expressive, professional-level figure work.'],['Animation 3','M','Dialogue and performance animation.'],['Storyboarding 2','M','Pacing and visual-storytelling polish.'],['Intro to Animal Drawing for Animators','M','Quadruped anatomy and locomotion.'],['3D Character Animation 1','M','Animating a rigged 3D character.'],['2D Computer Animation: Film Project 1','M','A sustained 2D short, part one.'],['Advanced Life Drawing 2','M','Continued at a further level.'],['Animation 3B','M','A polished performance piece.'],['3D Film Development & Pre-Production','M','Planning a 3D film project.'],['2D Computer Animation: Film Project 2','M','Completing the 2D short.']]},
+          {label:'Year 4', courses:[['Layout for 3D Animation','M','Staging and camera for 3D production.'],['3D In-Depth (Term 1)','M','Advanced 3D work — exact focus unpublished.'],['3D Character Animation 2','M','Advanced character performance in 3D.'],['3D Animation Production Part 1','M','Capstone film, part one.'],['3D In-Depth (Term 2)','M','Continuation of the Term 1 course.'],['Portfolio Development','M','Building the graduating demo reel.'],['3D Animation Production Part 2','M','Capstone film, completed.']]}
+        ]
+      },
+      {
+        name:'Concept Art Diploma', credential:'4-year diploma ("Concept Art for Animation & Video Games")',
+        portfolio:['2 figure drawings','1 object drawing','5 life drawings','1 perspective drawing','Character design: 1 character + props','1 finished illustration using that character','1 environment where the character would exist, with rough research sketches','5+ sketchbook / assorted pieces'],
+        academic:'Same as Animation — transcripts and a personal statement, no published minimum grade.',
+        curriculumSummary:'Shares the Year 1 drawing fundamentals with the other two diplomas, then splits off into concept-art-specific territory: environment visualization and prop design in Year 2, a parallel character-design-for-animation vs. character-design-for-games split in Year 3, and a capstone in Year 4 covering creature design, digital matte painting, and digital illustration.',
+        curriculumNote:'Same caveat as Animation — titles are confirmed, descriptions below are reasonable inferences, not official text.',
+        terms:[
+          {label:'Year 1', courses:[['Beginning Life Drawing 1 & 2','M','Entry-level figure drawing from a live model.'],['Perspective 1 & 2','M','One- and two-point construction.'],['Design & Composition','M','Visual-design fundamentals.'],['Principles of Drawing 1 & 2','M','Line, form, shading.'],['Introduction to Concept Art (2 parts)','M','What concept art is for, and first ideation exercises.'],['Colour Theory & Background Painting','M','Colour applied to environments.'],['Representational Painting 1 & 2','M','Traditional observational painting.'],['Structural Drawing 1','M','Forms built from underlying structure.'],['Intro to Character Design','M','Shape language for original characters.'],['Digital Background Painting','M','Digital environment painting.']]},
+          {label:'Year 2', courses:[['Intermediate Life Drawing 1','M','Progression beyond beginner level.'],['Artistic Anatomy','M','Skeleton and muscle structure.'],['Environment Visualization','M','Sketching imagined locations.'],['Drawing Heads & Features','M','Facial construction.'],['Layout','M','Compositional staging for presentation.'],['Environment Design & Painting','M','Painted environment design.'],['Drawing Props & Objects','M','Designing and rendering props for games.'],['Storyboarding for Concept Artists','M','Visualizing sequences and cinematics.'],['Intermediate Character Design','M','Beyond the Year-1 basics.'],['Portrait Painting in Oils','M','Traditional oil portraiture.'],['Drawing Hands & Feet','M','Focused construction practice.']]},
+          {label:'Year 3', courses:[['Figurative Drawing: The Sustained Pose','M','Long-pose, deep observational studies.'],['Advanced Life Drawing 1 & 2','M','Professional-level figure work.'],['Introduction to 3D Software','M','First 3D modelling tool.'],['Advanced Props & Objects','M','More complex design problems.'],['Introduction to Animal Drawing','M','Basis for later creature design.'],['Character Design for Animation','M','Animation-pipeline conventions.'],['Character Design for Video Games','M','Game-ready silhouette and readability.'],['Figurative Painting in Oils','M','Full-figure oil painting.'],['3D Modeling for Game Assets','M','Applied, game-ready modelling.']]},
+          {label:'Year 4', courses:[['Concept Art Final Project (both terms)','M','Sustained capstone portfolio project.'],['Creature Design 1 & 2','M','Original creature design.'],['Painting the Costumed Model','M','Fabric, texture, character presence.'],['Introduction to Digital Matte Painting + Part 2','M','Photoreal / stylized environment art.'],['Digital Illustration 1 & 2','M','Finished digital illustration work.'],['Portfolio Development','M','Final professional portfolio.']]}
+        ]
+      },
+      {
+        name:'Illustration & Storytelling for Sequential Arts', credential:'4-year diploma',
+        portfolio:['2 figure drawings','3 object drawings, three different viewpoints','5 life drawings','1 perspective drawing','Character design: 1 character + props','1 personal comic page','1 comic page adapting a script the school provides — pencils only, no ink or colour','5+ sketchbook / assorted pieces'],
+        academic:'Same transcripts-plus-statement process as the other two diplomas.',
+        curriculumSummary:'Same Year-1 fundamentals, then a genuine comics education: layout and composition, penciling and inking as separate production stages, scripting, lettering and digital colouring, then a two-term graphic-novel capstone in Year 4 alongside freelancing and self-promotion coursework.',
+        terms:[
+          {label:'Year 1', courses:[['Beginning Life Drawing 1 & 2','M','Entry-level figure drawing.'],['Perspective 1 & 2','M','Construction fundamentals.'],['Design & Composition','M','Visual-design basics.'],['Principles of Drawing 1 & 2','M','Line, form, shading.'],['Introduction to Comic Book Layout','M','Panel composition, pacing, reading flow.'],['Colour Theory & Background Painting','M','Colour fundamentals for backgrounds.'],['Representational Painting 1 & 2','M','Traditional painting fundamentals.'],['Intro to Character Design','M','Shape language for comics characters.'],['Constructive Figure Drawing','M','Building the figure from geometric forms.']]},
+          {label:'Year 2', courses:[['Comic Book Layout & Composition','M','Advanced page composition and flow.'],['Artistic Anatomy','M','Skeleton and muscle structure.'],['Intermediate Life Drawing 1 & 2','M','Progression beyond beginner level.'],['Cartooning for Comics 1 & 2','M','Exaggeration, line economy, expressive drawing.'],['Visual Storytelling for Comics','M','Panel transitions and pacing.'],['History of Sequential Arts','M','A survey of comics as an art form.'],['Drawing Backgrounds, Props & Structures','M','Environments for comic pages.'],['Penciling 1','M','First production stage — pencils.'],['Scripting for Comics','M','Comic-script format and pacing.'],['Computer Lettering & Colouring','M','Digital production for dialogue and colour.'],['Inking 1','M','Second production stage — ink.'],['Drawing Heads & Features','M','Facial construction.'],['Illustration 1','M','First standalone illustration course.']]},
+          {label:'Year 3', courses:[['Illustration for Children\'s Books 1 & 2','M','A specific commercial-illustration niche.'],['Character Design for Comics and Graphic Novels','M','Comics-specific design conventions.'],['Advanced Life Drawing 1 & 2','M','Professional-level figure work.'],['Intro to Graphic Novel Development','M','Structure and planning for a full book.'],['Inking 2 & 3 / Penciling 2 & 3','M','Progressing production skills.'],['Introduction to Animal Drawing','M','Anatomy for illustration.'],['Typography 1','M','Type and hand-lettering fundamentals.'],['Digital Media for Artists','M','Broader digital-tool fluency.'],['Drawing Hands & Feet','M','Focused construction practice.']]},
+          {label:'Year 4', courses:[['Creating Mobile Comics','M','Vertical-scroll / webtoon-style formats.'],['Advanced Graphic Novel Development (both terms)','M','A substantial original graphic-novel project.'],['Drawing Drapery & SFX','M','Fabric folds and comic impact effects.'],['Illustration 2','M','Advanced standalone illustration.'],['Intro to Storyboarding for Illustrators','M','Editorial / advertising / pitch storyboards.'],['Typography 2','M','Advanced type and lettering.'],['Infographics','M','Visual communication of data.'],['Digital Production','M','Prepping work for publication.'],['Freelancing & Self Promotion','M','Running an illustration business.'],['Portfolio Development','M','Final professional portfolio.'],['Creating Motion Comics','M','Comics with limited animation and sound.']]}
+        ]
+      },
+      {
+        name:'Foundations Certificate', credential:'1-year certificate',
+        portfolio:['2 life drawings','2 environment drawings — one interior, one exterior','1 object drawing','5 sketchbook pages'],
+        academic:'Same application process; built from the shared first year of the three diplomas above.',
+        curriculumSummary:'A single year covering the same ground as everyone\'s first year — life drawing, perspective, structural drawing, representational painting, design &amp; composition — plus a standalone art-history course and a career-development capstone. Two of the studio courses are marked "no labs," meaning slightly fewer supervised hours than the full diploma equivalent.',
+        curriculumNote:'The 2025-26 Viewbook separately teases a "1-year foundation program… pending approval" — it\'s not clear if that\'s this program evolving or a second, different one. Worth asking.',
+        terms:[
+          {label:'Fall', courses:[['Basic Life Drawing 1 (no labs)','M','Entry-level figure drawing.'],['Representational Painting 1 (no labs)','M','Traditional painting basics.'],['Perspective 1','M','Construction fundamentals.'],['Constructive Figure Drawing','M','Figure from geometric forms.'],['Design & Composition','M','Visual-design basics.'],['History of Visual Arts','M','Survey/lecture course.']]},
+          {label:'Winter', courses:[['Basic Life Drawing 2 (no labs)','M','Continuation.'],['Representational Painting 2 (no labs)','M','Continuation.'],['Perspective 2','M','Continuation.'],['Structural Drawing','M','Forms from underlying structure.'],['Colour Theory','M','Hue, value, harmony.'],['Career Development for the Visual Arts','M','Portfolio basics and next-step planning.']]}
+        ]
+      }
+    ],
+    sources:[
+      ['DeviantArt journal','2008','A then-student defends the school against online critics — praises one-on-one faculty feedback, says it "isn\'t for everyone."','https://www.deviantart.com/rikuson/journal/My-EXPERIENCES-at-Max-The-Mutt-Animation-School-235350980'],
+      ['The Rookies','Dec 2021','Current-student quote praising industry-experienced teachers and small classes; mentions Maya/ZBrush in the Animation stream.','https://www.therookies.co/blog/insiders-guide-max-the-mutt/'],
+      ['Indeed / Glassdoor (staff reviews)','2022','Employee accounts call the post-acquisition workplace "disorganized" and worse — these are staff, not student, reviews, but worth knowing about the 2022 ownership change.','https://ca.indeed.com/cmp/Max-the-Mutt-College-of-Animation,-Art-&-Design/reviews'],
+      ['TrustAnalytica (aggregated Google reviews)','ongoing','~3.8–3.9 / 5 across 37 reviews — general praise for small classes and dedicated instructors.','https://trustanalytica.org/ca/on/toronto/reviews/mtm-college-of-animation-art-design'],
+      ['Official Viewbook alumni notes','2023 & 2025 grads','Named alumni include a BoJack Horseman animation director, an Eisner-winning colorist, and an EA/Respawn concept artist — marketing material, but real names.','https://mtmcollege.ca/wp-content/uploads/2025/09/VIEWBOOK-2025-26.pdf']
+    ],
+    verify:['Whether Dec 20 is a true hard cutoff or the "still accepting" rolling pattern continues past it.','Whether the 4-year diploma survives into Fall 2027, or a 2-year version has replaced it by then.','The exact digital submission method — not published anywhere.']
+  },
+  {
+    id:'ocad', name:'OCAD University', sub:'no program literally called "Animation" or "Concept Art"', site:'https://admissions.ocadu.ca',
+    flag:'OCAD doesn\'t have a program named Animation or Concept Art — those skills live inside broader studio degrees. Illustration is the closest match; Experimental Animation is the closest to traditional animation training. All dates below were explicitly labelled "Timeline for Fall 2027 entry" on OCAD\'s own site, so these are current, not leftover from last cycle.',
+    stats:[['Feb 10 \'27','Portfolio, every program'],['70%','Minimum average'],['$159+','OUAC application fee'],['SlideRoom','Submission platform']],
+    programs:[
+      {
+        name:'Illustration', credential:'BDes (Honours) — the strongest match for character design / concept art',
+        portfolio:['8–10 finished pieces, plus a sketchbook (counts as one piece)','Observational drawing required — life studies valued where available','Variety of media, colour, tone, and composition','A roughly 50-word note per piece explaining process and intent'],
+        portfolioNote:'OCAD is explicit that work done purely in an existing commercial style — anime, Disney, caricature — "won\'t effectively showcase abilities." They want to see your own observational and creative skill, not style mimicry.',
+        academic:'70% overall average, six Grade 12 U/M courses including English at 70%+, OSSD. Meeting this doesn\'t guarantee admission — portfolio carries real weight.',
+        curriculumSummary:'Not a fixed year-by-year list — a short run of mandatory "core" studio courses per year (each needing 60%+ to continue) plus large elective pools students pick from. Year 1 and 2 build concept-development and observational skills (Illustrative Concepts, Observational Illustration, Media Studio in both analogue and digital). Year 3 shifts into illustrative painting and the core Illustration sequence. Year 4 is wide open — most students take the two-term Thesis Portfolio, but the elective pool includes Concept Art: Characters, Concept Art: Settings, Storyboarding, Graphic Novel Illustration, and Animated Illustration specifically.',
+        curriculumNote:'Full catalogue-style descriptions sit behind a student login OCAD doesn\'t expose publicly — course titles, sequencing, and mandatory/elective status below are all confirmed from the official Program Guide; the short descriptions are OCAD\'s own published framing where available.',
+        terms:[
+          {label:'Year 1 — mandatory core', courses:[['Illustrative Concepts 1 & 2','M','Idea generation and visual problem-solving; need 60%+ to continue.'],['Media Studio: Analogue','M','Traditional illustration media and materials.'],['Observational Illustration 1','M','Direct observational drawing as a foundation skill.']]},
+          {label:'Year 2 — mandatory core', courses:[['Illustration 1 & 2','M','The central Illustration studio sequence; need 60%+ to continue.'],['Observational Illustration 3','M','Third in the observational-drawing strand.'],['Media Studio: Digital','M','Digital illustration tools and workflow.']]},
+          {label:'Year 3 — mandatory core', courses:[['Illustrative Painting 2 & 3','M','Painting-based rendering and technique.'],['Illustration 3 & 4','M','Final core sequence; gates into the Year 4 thesis.']]},
+          {label:'Year 4 — electives, pick a path', courses:[['Illustration Thesis Portfolio 1 & 2','E','Faculty-guided capstone — the recommended default.'],['Concept Art: Characters / Settings / Painting','E','Three separate concept-art electives, if that\'s the direction.'],['Storyboarding, Graphic Novel Illustration, Book Illustration, Animated Illustration','E','The electives most aligned with character design and entertainment art.'],['Illustrative Painting 4 & 5','E','For students pursuing gallery/fine-art painting instead.']]}
+        ]
+      },
+      {
+        name:'Experimental Animation', credential:'BFA (Honours)',
+        portfolio:['No program-specific requirement published — follow OCAD\'s shared first-year framework (8–10 pieces + sketchbook, same SlideRoom submission)'],
+        academic:'Same university-wide baseline as Illustration — 70% average, OSSD, no extra animation-specific prerequisite found.',
+        curriculumSummary:'Year 1 pairs an animation-specific introduction (Intro: Experimental Animation, Animation Reframed) with the same foundation courses every Art-faculty first-year takes. Year 2 adds Animated Storytelling, Beyond the Frame, and 2D Digital Animation Principles. Year 3 is a two-term course — "From Concept to Creation I & II" — where students carry one short film from concept and storyboard through to a finished animatic and final animation. Year 4 is built around a two-term Thesis (Research &amp; Concept, then Production), which is effectively the program\'s calling card.',
+        terms:[
+          {label:'Year 1', courses:[['Intro: Experimental Animation','M','Histories, techniques, and principles of animation as a contemporary art form.'],['Animation Reframed','M','Paired foundational course.'],['Drawing Across Disciplines','M','Shared first-year drawing foundation (also taken by Drawing & Painting, Integrated Media).'],['Form and Time','M','Shared first-year studio core.']]},
+          {label:'Year 2', courses:[['Contemporary Issues','M','Shared studio-seminar on contemporary art theory.'],['Animated Storytelling','M','Narrative and storytelling skills for animation.'],['Beyond The Frame','M','Expanded / non-traditional animation formats.'],['2D Digital Animation Principles','M','Core digital 2D animation fundamentals.']]},
+          {label:'Year 3', courses:[['From Concept to Creation I','M','Pre-production: concept, script, storyboard, animatic.'],['From Concept to Creation II','M','Execution: animation, sound, post-production.']]},
+          {label:'Year 4', courses:[['Thesis Research & Concept + Thesis Production','M','Two-term capstone — the program\'s central project.'],['Animation, Identity & Culture / Creating Animated Performance','E','Upper-level electives.']]}
+        ]
+      },
+      {name:'Drawing & Painting', credential:'BFA (Honours) — traditional fine art, not entertainment-focused', portfolio:['Shares OCAD\'s general first-year framework (8–10 pieces + sketchbook)'], academic:'Same university-wide baseline.', curriculumSummary:'A straight fine-art painting/drawing degree — not aimed at character design or concept art, but it does carry an elective "Animation fundamentals" course and arguably the strongest pure observational-drawing training on this list. Worth knowing about as a foundation-building option, not a primary target.'},
+      {name:'Integrated Media', credential:'BFA (Honours)', portfolio:['Shares OCAD\'s general first-year framework'], academic:'Same university-wide baseline.', curriculumSummary:'A broad new-media degree — film, sound, code, performance, installation — where animation is one elective thread rather than a specialization. The program that used to combine this with animation directly ("Digital Painting and Expanded Animation") has been discontinued in favour of the standalone Experimental Animation program above.'},
+      {name:'Digital Futures', credential:'BDes/BFA (Honours)', portfolio:['Accepts both visual and non-visual applicants — up to 10 pieces plus a creative journal; "passion and curiosity over technical perfection."'], academic:'Same university-wide baseline.', curriculumSummary:'Covers game design explicitly but not character design or concept art specifically — the emphasis is UI/UX, VR/AR, and interactive technology. Included for completeness; a weaker match than Illustration or Experimental Animation for your stated interests.'}
+    ],
+    sources:[
+      ['wingedcanvas.com blog','~2021','An accepted Illustration student breaks down her portfolio — observational studies, personal work, storyboards, and concept art in both digital and traditional media. Advises researching what OCAD specifically wants, avoiding fan art, and keeping artist statements under 250 words.','https://www.wingedcanvas.com/single-post/how-to-build-an-illustration-portfolio-advice-examples-from-an-accepted-ocad-illustration-student'],
+      ['jinniexy.blogspot.com','2013','An older account where the interview focused almost entirely on the sketchbook, barely glancing at finished pieces — likely outdated given OCAD\'s current SlideRoom-only process, but a useful signal that process matters.','http://jinniexy.blogspot.com/2013/03/example-portfolio-for-ocad-and-emily.html'],
+      ['Multiple "accepted OCAD portfolio" videos','2021–2022','YouTube walkthroughs of successful OCAD portfolios; titles confirmed, full content not independently verified.','https://www.youtube.com/results?search_query=accepted+ocad+portfolio'],
+      ['Quora thread (paraphrased)','undated','Mixed opinions — OCAD described as "very high art" but "not oriented enough towards the practical realities… of making a living from your art" by one respondent; another says for Illustration specifically "you really will not find anywhere else better."','https://www.quora.com/What-is-your-review-of-OCAD-University-Toronto-Ontario']
+    ],
+    verify:['OCAD doesn\'t publish acceptance rates — ignore any "~63%" figure online; it has no traceable source.']
+  },
+  {
+    id:'seneca', name:'Seneca Polytechnic', sub:'rebranded from Seneca College', site:'https://www.senecapolytechnic.ca',
+    flag:'Game Art &amp; Animation and 3D Animation are <b>graduate certificates</b> that require a prior diploma or degree — not open to you straight out of Grade 12. Visual Effects for Film &amp; TV is currently <b>unavailable</b> (its admission page says so outright). Animation and Illustration are the two programs actually open to you this cycle.',
+    stats:[['Feb 1 \'27','Equal consideration'],['$150','Application fee (ontariocolleges.ca)'],['Not fixed','Portfolio deadline — emailed individually'],['SlideRoom','Submission platform']],
+    programs:[
+      {
+        name:'Animation (ANI)', credential:'Advanced Diploma, 3 years / 6 semesters',
+        portfolio:['1 life drawing — the entire body','1 drawing of your own hand, from observation','1 object drawing — a solid everyday item','1 environment drawing — two-point perspective, a room in your house','1 drawing or other piece of your choice, showing your own interests'],
+        academic:'OSSD plus Grade 12 English (C or U). No published minimum average.',
+        curriculumSummary:'Semesters 1–2 are shared fundamentals — design, film language, digital tools, life drawing, structural drawing. Starting Semester 3, you choose one of four streams and stay in it for the rest of the diploma: 2D Animation, Digital/3D Animation, Gaming, or Visual Development. Every course inside a chosen stream is mandatory; there\'s no further picking once you\'ve picked the stream.',
+        terms:[
+          {label:'Semesters 1–2 (shared)', courses:[['Design for Animation I & II','M','Core visual-design language and early character-design fundamentals.'],['Film Language I & II','M','Composition, shot selection, storyboard basics.'],['Digital Tools I & II','M','3D production fundamentals — modelling, texturing, lighting.'],['Animation Fundamentals I & II','M','Timing, spacing, movement analysis.'],['Structural Drawing for Animation I & II','M','Perspective, volume, sequential storytelling.'],['Life Drawing I & II','M','Figure drawing; Semester 2 adds anatomy study.'],['Animation Success Practices','M','Time management and professional skills.'],['Guest Animation Professional Series','M','Working professionals talk through real career paths.']]},
+          {label:'Semester 3–6: pick one stream', courses:[['2D Animation','M','Character/prop design, storyboarding, background design, compositing, effects animation — a traditional 2D-production path.'],['Digital / 3D Animation','M','3D lighting, look development, modelling, rigging, real-time graphics — a CG-production path.'],['Gaming','M','Surfacing and lighting for games, digital sculpting, game engines, a final game project and capstone thesis.'],['Visual Development','M','Design lecture series, environment and location design, digital painting, animation across genres — the path closest to pure concept art / visual development work.']]}
+        ]
+      },
+      {
+        name:'Illustration (ILS)', credential:'Ontario College Diploma, 16 months',
+        portfolio:['Seneca\'s own pages disagree: the general admissions page lists 5 pieces (same categories as Animation above); the program\'s own dedicated site lists 10 — two each of life, hand, object, and environment drawings, plus two free-choice pieces.','Where specified: perspective and object drawings in pencil or ink; figure drawings in pencil, conté, pastel, or charcoal.'],
+        portfolioNote:'This is a genuine conflict between two official Seneca pages, not a research gap — worth a direct call before committing to one count.',
+        academic:'Same as Animation — OSSD plus Grade 12 English (C or U), no published minimum average.',
+        curriculumSummary:'Four semesters. Starts with traditional media, digital drawing fundamentals, and illustration history; moves through printmaking, children\'s illustration, and visual-development/digital-painting work aimed squarely at character and entertainment art; finishes with editorial illustration, freelance-business courses, comics/sequential narration, and a specialization studio run on real production deadlines.',
+        terms:[
+          {label:'Semester 1', courses:[['Traditional Illustrative Media I: Paint','M','Watercolour, ink, gouache, acrylic across surfaces.'],['Digital Drawing and Type','M','Photoshop/Illustrator, colour theory, 2D design.'],['Applied Illustration Research and History','M','Illustration history from manuscripts to modern editorial work.'],['Life Drawing I','M','Interpretive figure drawing.'],['Structure and Story I','M','Perspective, proportion, rendering 3D form.'],['Essential Professional and Relational Skills','M','Time management, networking, business communication.'],['Digital Paint: Basics','M','Light, shadow, and brush fundamentals.']]},
+          {label:'Semester 2', courses:[['Illustrative Media II: Printmaking','M','Relief, silkscreen, stencil, intaglio.'],['Iconography and Concept Development','M','Visual metaphor as a design tool.'],['Structure and Story II','M','Character construction across poses.'],['Life Drawing II','M','Narrative drawing with props and gesture.'],['Children\'s Illustration','M','Picture books, spot illustration, illustrated games.'],['Visual Development and Digital Paint I','M','Character design for animation, comics, and game art.']]},
+          {label:'Semester 3', courses:[['Traditional Illustrative Media III: Sculpture','M','Texture and form through armature building.'],['Editorial Illustration and Critical Thinking','M','Narrative, conceptual, and opinion-driven illustration.'],['Business I','M','Pricing, copyright, contract basics for freelancers.'],['Sequential Narration and Comics','M','Panel framing, transitions, timing.'],['Visual Development and Digital Paint II','M','Likely a continuation of the Semester-2 character work — not separately described on Seneca\'s site.'],['3D Illustration','M','Likely extends the sculpture course into 3D illustration techniques — not separately described.']]},
+          {label:'Semester 4', courses:[['Specialization Studio','M','Custom themed illustrations on a real production schedule.'],['Life Drawing III','M','Narrative drawing, continued.'],['Professional Practices','M','Career-readiness — not separately described on Seneca\'s site, inferred from title and placement.'],['Business II','M','Likely continues Business I — not separately described.'],['Website and Portfolio Development','M','Building a professional portfolio site.']]}
+        ]
+      }
+    ],
+    sources:[
+      ['Tumblr post','2021','An accepted Animation student shares portfolio tips — heavy anatomy practice, pick personal pieces that contrast stylistically.','https://www.tumblr.com/lukosei/646599904061538304/'],
+      ['Blogspot','2018','Accepted with a (now outdated) 10-piece portfolio, chose Seneca over a Centennial 3D Animation offer: "certainly not my best work, but it got me in."','http://savoureads.blogspot.com/2018/03/accepted-seneca-animation-portfolio-2018.html'],
+      ['Animation Portfolio Workshop (coaching business gallery)','ongoing','Shows students admitted to Seneca alongside Sheridan, OCAD, Emily Carr, Algonquin, and MICA — most strong applicants are running several of these in parallel, not just one.','https://animationportfolioworkshop.com/accepted-portfolios/'],
+      ['timrlai.tumblr.com','~2013','A then-current Illustration student calls the program "pretty intense" but praises strong, kind faculty and the career-oriented freelance-business coursework.','https://timrlai.tumblr.com/post/76657161571/']
+    ],
+    verify:['Illustration\'s real piece count — 5 or 10, Seneca\'s own site disagrees.','Whether the one "Oct 30, 2026" portfolio-deadline figure circulating online is real — it couldn\'t be traced to anything official.']
+  },
+  {
+    id:'centennial', name:'Centennial College', sub:'Animation – 3D is currently suspended', site:'https://www.centennialcollege.ca',
+    flag:'Centennial suspended Animation – 3D (and Digital Visual Effects) through at least Summer 2027 as part of a broader round of program cuts tied to federal international-student caps. Its Fall 2027 status couldn\'t be confirmed — Centennial\'s own suspension-tracking page was returning a server error on every check during this research. <b>Game – Art is active</b> and is the better-aimed option for you right now regardless.',
+    stats:[['Feb 1 \'27','Equal consideration'],['$150','Application fee (ontariocolleges.ca)'],['Not fixed','Portfolio session booked after invitation'],['Fall 2026','Programs move to Progress Campus']],
+    programs:[
+      {
+        name:'Game – Art', credential:'Ontario College Diploma, 2 years / 4 semesters',
+        portfolio:['10–15 pieces total, digital (PDF preferred, or a link to an online portfolio) — bring a physical copy too, for the session','~5 pieces of digital artwork — Maya, 3ds Max, ZBrush, Photoshop, or similar','Colour and tonal studies showing colour theory','1–5 perspective drawings','Sketchbook pages showing concept development','1–5 figure or life drawings','Up to 3 optional pieces — sculpture, photography, printmaking, creative writing, performance'],
+        portfolioNote:'Centennial says explicitly it favours applicants who show real traditional life-drawing skill on top of software fluency — don\'t lean entirely digital.',
+        academic:'OSSD plus Grade 12 English (C or U), or the Centennial English Admission Test. No published minimum average.',
+        curriculumSummary:'Four semesters, almost entirely mandatory with two general-education elective slots. Builds digital art and design fundamentals in Semester 1, moves through 2D/3D asset creation and texturing, and finishes with level design and game-engine integration — aimed at exactly the "character artist / concept artist" outcomes the program names on its own page.',
+        terms:[{label:'Confirmed structure', courses:[['Digital art & design fundamentals','M','Semester 1 — core drawing, design, and software onboarding.'],['2D/3D asset creation & texturing','M','The technical core of the diploma.'],['Level design & game-engine integration','M','Later semesters — building and placing assets in a working engine.'],['General Education','E','Two elective slots across the diploma.']]}],
+        curriculumNote:'Centennial publishes individual course-description pages for this program (GAME-1xx through GAME-415) — confirmed and reliable, just condensed here rather than listed course-by-course.'
+      },
+      {
+        name:'Animation – 3D', credential:'Diploma — currently suspended',
+        portfolio:['Historical, pre-suspension requirements: a perspective drawing of a room, a digitally created image, and a page of original character design (2 full-body poses, 2 facial expressions), submitted as 8.5×11 photocopies only.'],
+        portfolioNote:'Treat all of this as reference only, not something to prepare toward, until Centennial confirms the program is reopening.',
+        academic:'Historical: OSSD plus Grade 12 English (C or U).',
+        curriculumSummary:'Could not be confirmed directly — the program page no longer resolves. A partial, lower-confidence picture (via individual course pages still live under the old program tag, plus a third-party aggregator) suggests a Maya-based 3D pipeline: modelling, rigging, lighting, character animation, and a final production course.'
+      },
+      {
+        name:'Art and Design Fundamentals', credential:'1-year certificate, online option available',
+        portfolio:['No portfolio required'],
+        academic:'OSSD plus Grade 12 English (C or U).',
+        curriculumSummary:'Two semesters covering drawing, design, colour, basic 3D modelling, digital illustration, and photography. A genuine bridge option if Game – Art doesn\'t work out on the first try, or if you want to strengthen fundamentals before reapplying.'
+      }
+    ],
+    sources:[
+      ['Centennial student-success blog','April 2025','A real Game – Art student, Anya Ng-Chee, describes small hands-on classes and a cross-program final project with U of T programming students; she went on to win Ubisoft Next 2025 and landed a Ubisoft Toronto internship.','https://www.centennialcollege.ca/started-at-centennial-blog/2025/april/21/from-game-art-student-to-ubisoft-intern-anya-ng-chee-s-journey-from-centennial-college-to-ubisoft-next-2025-winner/'],
+      ['CourseCompare.ca reviews','2025–2026','Mixed and mostly not program-specific — one 1-star review about a billing dispute, one 5-star review that\'s actually about a different program entirely.','https://www.coursecompare.ca/courses/toronto/centennial-college/game-art/'],
+      ['Quora (paraphrased)','undated','Generally positive — describes Centennial as "an excellent place… for a serious academic experience" with industry-pro instructors.','https://www.quora.com/How-is-game-art-at-Centennial-College']
+    ],
+    verify:['Whether Animation – 3D reopens for Fall 2027 — check Centennial\'s Program Availability Updates page directly, it was down for every attempt made here.']
+  },
+  {
+    id:'sheridan', name:'Sheridan College', sub:'heaviest, most structured portfolio on this list', site:'https://www.sheridancollege.ca',
+    flag:'The detailed official portfolio PDFs online right now are for the <b>Fall 2026</b> intake — one cycle behind yours. Every specific date below is last cycle\'s; Sheridan posts the current one to the Applicant Portal after you apply, usually a few months into the cycle.',
+    stats:[['Feb 1 \'27','Equal consideration'],['65%','Minimum average (Animation/Illustration)'],['$150 +$50','Application fee + portfolio assessment'],['~Feb 19 \'26','Last cycle\'s portfolio deadline']],
+    programs:[
+      {
+        name:'Honours Bachelor of Animation', credential:'4-year Honours Bachelor\'s degree',
+        portfolio:['4 observational drawings — traditional media only, not digital: 2 seated/standing figure studies (5–20 min poses), 2 gesture poses (1–3 min)','Character rotation: 1 original character, front / ¾-front / profile / ¾-back, on one page — no existing characters, zero AI tolerance','A short animation: 24–72 images animating a provided character ("Hard Drive"), any medium','A storyboard: 10–12 panels, no dialogue required, using a provided template','2 perspective drawings — 1 interior, 1 exterior','15 sketchbook pages, raw and unedited','4–6 additional personal pieces from a defined category list'],
+        portfolioNote:'The most structured, most demanding ask of any school here. AI-generated imagery anywhere in the set is an automatic zero.',
+        academic:'65% overall average, Grade 12 English (ENG4U), one Visual Arts or Communication Technology credit, OSSD.',
+        curriculumSummary:'8 semesters plus a mandatory 420-hour internship between Years 3 and 4. Years 1–2 build life drawing, layout, painting, character design, and the first digital tools in parallel. Year 3 moves into 3D animation and advanced action analysis. Years 3–4 centre on a year-long group film project (story, layout, performance) and close with an individual Senior Animation Project and Capstone Film in Year 4.',
+        terms:[
+          {label:'Semester 1', courses:[['Introduction to Life Drawing','M','Gesture, contour, proportion, basic skeletal structure.'],['Story Development 1','M','Visual language and cinematic storytelling fundamentals.'],['Principles of Layout 1','M','Structure, perspective, composition for animation layout.'],['Introduction to Painting','M','Colour theory and form rendering for animation.'],['Animation Principles 1','M','How the illusion of motion is built from sequential drawings.'],['Character Design 1','M','Structural, shape-based character design basics.'],['Introduction to Digital Tools 1','M','Taking rough animation and layout into a digital pipeline.'],['Composition and Rhetoric','M','General-education writing course.']]},
+          {label:'Semester 2', courses:[['Introduction to Dynamic Anatomy','M','Human/animal musculature and volumetric form for character work.'],['Story Development 2','M','Full storyboard process, sketch to finished panels.'],['Principles of Layout 2','M','Continuity, staging, camera moves.'],['Animation History','M','A survey from pre-cinema to the present.'],['Animation Principles 2','M','Expression, full character "takes," walk cycles.'],['Character Design 2','M','Economizing detail; animal anatomy, aging, caricature.'],['Introduction to Digital Tools 2','M','Compositing finished animation with layouts.'],['Digital Painting','M','Digital background painting for animation.'],['Breadth Elective','E','Chosen from Sheridan\'s elective list.']]},
+          {label:'Semester 3', courses:[['Intermediate Figure Analysis','M','Musculature and dynamic form within environments.'],['Storyboarding: Creative Structure','M','Full story scripts, boards, and story reels.'],['2D Layouts','M','Layout for a digital 2D production pipeline.'],['Animation: Action Analysis','M','Human movement, gravity, and momentum in any technique.'],['3D Animation','M','Keyframe principles, kinematics, motion paths in CG.'],['2D Applications','M','Timing and acting using pre-existing character rigs.'],['Breadth Elective','E','Chosen from Sheridan\'s elective list.']]},
+          {label:'Semester 4', courses:[['Exploration of Figure Analysis','M','Volumetric drawing, costume studies, creature-design anatomy.'],['Sequential Narrative','M','Storyboarding to pre-timed audio for TV/feature pipelines.'],['CG Layouts','M','3D layout: staging, camera, animatics.'],['Digital Methodologies: Sound','M','Sound theory and editing for a finished short-film soundtrack.'],['Animation: Dialogue','M','Lip-sync and dialogue-driven performance.'],['Breadth Elective','E','Chosen from Sheridan\'s elective list.'],['Choose two: Short Film Workflow / 3D Character Animation / Advanced 2D Applications','E','Production-process, 3D performance, or advanced 2D character work.']]},
+          {label:'Semester 5', courses:[['Continuity, Design and Figurative Performance','M','Personalized figurative expression for complex animation.'],['Storyboarding: Advanced Story','M','Group-film storyboards; complex arcs and motivation.'],['Layout: Pre-Production','M','Pitch, location/prop design, colour keys for the group film.'],['Stop Motion','M','Physical-camera staging and performance.'],['Animation Performance & Process','M','Refining character performance for the group project.'],['Co-op Forum','M','Internship job-search preparation.'],['Breadth Elective','E','Chosen from Sheridan\'s elective list.'],['Choose one: 2D Digital Character Animation / 3D Modelling','E','Scene-level character animation, or modelling toward a capstone character.']]},
+          {label:'Work Term', courses:[['Internship Work Term (420 hrs)','M','A mandatory, Sheridan-approved industry placement.']]},
+          {label:'Semester 6', courses:[['Exploring Character and Costume','M','How costume and clothing convey identity and emotion.'],['Storyboarding: Project Development','M','Independent research and portfolio build toward the Year-4 senior project.'],['Layout: Production','M','Executing the group film\'s background/layout pipeline.'],['Animation: Production','M','Producing industry-standard animation for the group short film.'],['Breadth Elective','E','Chosen from Sheridan\'s elective list.'],['Choose one: Advanced Stop Motion / Concept Art / 3D Rigging and Set Up','E','Puppet fabrication, concept-art portfolio work, or character rigging.']]},
+          {label:'Semester 7', courses:[['Senior Animation Project','M','An independent, mentor-guided professional-quality short film.'],['Breadth Elective','E','Chosen from Sheridan\'s elective list.'],['Choose one: Advanced Figure Drawing & Art Direction / Final Frame 2D / Final 3D Frame Creation','E','Advanced drawing, or final technical finishing in 2D or 3D.']]},
+          {label:'Semester 8', courses:[['Capstone Animation Project','M','A final professional independent film — 2D, 3D, or stop motion — with an industry-facing demo reel.'],['Business Practices','M','Job search, contracts, IP, and self-employment in the animation industry.'],['Breadth Elective','E','Chosen from Sheridan\'s elective list.']]}
+        ]
+      },
+      {
+        name:'Honours Bachelor of Illustration', credential:'4-year Honours Bachelor\'s degree',
+        portfolio:['A timed Drawing Test — 70% of the score: a 30-minute observational drawing of a seated figure; a still-life composition exercise with 3 process sketches, a final drawing, and a 150-word written reflection; two series of five quick observational drawings (10 total, all under 30 minutes, no photo reference)','A Portfolio of Original Work — 30% of the score: 10–15 pieces (max 2 digital), 15–25 sketchbook pages'],
+        portfolioNote:'No anime, cartoon, fantasy, or video-game character designs accepted — Sheridan says directly these "do not help us determine suitability." AI-assisted work is disqualifying.',
+        academic:'Same baseline as Animation — 65% average, ENG4U, one Visual Arts/Comm Tech credit, OSSD.',
+        curriculumSummary:'8 semesters plus a 14-week work placement between Years 3 and 4. Four life-drawing-and-painting courses run across Years 1–2 alongside conceptual-process and design-principles courses. Years 3–4 shift into professional practice — information illustration, narrative/sequential work, and two thesis courses (Semester 7 and the Semester 8 capstone) built around a self-directed major project and a graduate show.',
+        terms:[
+          {label:'Semester 1', courses:[['Illustrative Drawing: Structure and Form','M','Observational drawing of simple and complex forms.'],['Illustrative Life Drawing & Painting 1','M','The human figure through direct observation, drawing and painting.'],['Illustration Conceptual Process 1','M','Verbal, written, and visual idea-generation methods.'],['Illustration Design Principles 1','M','Design elements, typography, composition for illustrators.'],['Composition and Rhetoric','M','General-education writing course.']]},
+          {label:'Semester 2', courses:[['Illustration Conceptual Process 2','M','Ideation methods through research and critique.'],['Illustration Life Drawing & Painting 2','M','Surface anatomy, portraiture, compositional strategy.'],['Illustrative Drawing: Structure and Space','M','Perspective, tone, pictorial construction.'],['Illustration Design Principles 2','M','Characters, settings, and narrative through composition.'],['Degree Breadth Elective','E','Chosen from Sheridan\'s elective list.']]},
+          {label:'Semester 3', courses:[['Illustration Concepts','M','Theories of visual representation; narrative and conceptual illustration.'],['Illustrative Painting: Colour & Light','M','Rendering form, volume, and space in traditional and digital paint.'],['Illustrative Figure Drawing','M','Expressive, simplified figure work.'],['Illustration Media Principles','M','Professional use of traditional media and mark-making.'],['Degree Breadth Elective','E','Chosen from Sheridan\'s elective list.']]},
+          {label:'Semester 4', courses:[['Illustration Disciplines 1: Visual Methods','M','2D/3D, physical/digital problem-solving; peer collaboration.'],['Illustrative Painting: Environment','M','Multi-figure compositions within thematic environments.'],['Illustrative Drawing: Motion & Environment','M','Character development, storyboards, sequential drawing.'],['Illustration Media Strategies','M','Collage, relief, and rendering techniques.'],['Degree Breadth Elective','E','Chosen from Sheridan\'s elective list.']]},
+          {label:'Semester 5', courses:[['Illustration Disciplines 2: Visual Strategies','M','Professional contexts — entertainment, engagement, information.'],['Information Illustration','M','Visualizing complex data clearly and persuasively.'],['Illustrative Drawing and Painting','M','Historical analysis feeding studio experimentation.'],['Illustration Design Studio','M','Typography and graphic design across print/digital platforms.'],['Degree Breadth Elective','E','Chosen from Sheridan\'s elective list.'],['Cooperative Education Internship Forum','M','Preparation for the work-placement job search.']]},
+          {label:'Work Placement', courses:[['Internship Work Term','M','A mandatory 14-week Sheridan-approved placement.']]},
+          {label:'Semester 6', courses:[['Illustration Professional Studies','M','Market-research-informed body of work; entrepreneurial practice.'],['Contemporary Illustration & Commentary','M','Illustration theory, history, and current issues.'],['Illustration Special Topics (x2)','M','Self-directed workshop across professional markets; portfolio development.'],['Degree Breadth Elective','E','Chosen from Sheridan\'s elective list.']]},
+          {label:'Semester 7', courses:[['Illustration Thesis','M','A major self-directed project, proposed and delivered on a personal schedule.'],['Illustration Entrepreneurial Studies','M','Freelance/studio landscape; artist statement and marketing plan.'],['Illustration Narrative','M','Sequential-image storytelling across platforms.'],['Illustration Workshop','M','Cross-disciplinary portfolio-building, client-style challenges.'],['Degree Breadth Elective','E','Chosen from Sheridan\'s elective list.']]},
+          {label:'Semester 8', courses:[['Illustration Advanced Thesis','M','Capstone — a self-directed major thesis project with a faculty art-director.'],['Illustration Emerging Markets','M','Final portfolio built under workplace-like conditions; graduate show.'],['Illustration Visual Essay','M','Sequential imagery translating research into narrative.'],['Breadth Elective','E','Chosen from Sheridan\'s elective list.']]}
+        ]
+      },
+      {name:'Honours Bachelor of 3D Animation and Emerging Technologies', credential:'4-year Honours Bachelor\'s degree, launching Sept 2026', portfolio:['Confirmed offered for Sept 2027. Portfolio required but the specific piece list hadn\'t been published publicly as of this research — it\'s posted to the Applicant Portal after you apply.'], academic:'65% average, ENG4U, one Visual Arts/Comm Tech credit or Math, OSSD.', curriculumSummary:'A brand-new program, so most of its course outlines aren\'t published yet. What is confirmed: 8 semesters plus a 420-hour internship, opening with computer-graphics math and asset-creation fundamentals, moving through motion capture and performance-capture animation, then a two-semester capstone production with its own portfolio/branding course.'},
+      {name:'Honours Bachelor of Game Design', credential:'4-year Honours Bachelor\'s degree', portfolio:['Not an art portfolio — a written "Game Design Exercise Worksheet," 500 words.'], academic:'65% average, ENG4U, and Grade 12 Math (U) instead of the Visual Arts credit the art programs require.', curriculumSummary:'8 semesters plus a Co-op work term. Design and systems theory run throughout (foundations, play design, mechanics, systems, data-driven design), paired with four Programming for Game Designers courses and three Game Asset Creation courses covering art/animation integration — genuinely multidisciplinary, but design and code carry more weight than pure art.'},
+      {name:'Computer Animation & Digital Creature Animation', credential:'Graduate Certificates — require a prior diploma/degree', portfolio:['Not open to you directly from Grade 12 — these sit on top of an existing postsecondary credential.'], curriculumSummary:'One year each, split into asset creation, animation methodology, technical direction (rigging), and lighting/look-development courses, closing with a capstone and an industry-facing demo reel course. Worth knowing about as a next step after a first diploma or degree, not for this application cycle.'},
+      {name:'Visual and Creative Arts & Art Fundamentals', credential:'Diploma and Certificate — no portfolio required for either', portfolio:['No portfolio needed for admission to either program.'], curriculumSummary:'Visual and Creative Arts (2 years) runs observational and figure drawing — explicitly including the nude figure — alongside 2D/3D design, painting, and colour theory, with a elective-heavy final year across drawing, sculpture, digital media, and design studios. Art Fundamentals (1 year) covers the same core ground at a introductory level and feeds directly into Year 2 of Visual and Creative Arts — and is also a documented, official transfer pathway into OCAD.'}
+    ],
+    sources:[
+      ['matthewglanfield.wordpress.com','2016','Rejected the first year for being "too derivative" of other accepted portfolios he\'d studied, got in the second year after requesting his score be re-examined. Detailed, section-by-section advice.','https://matthewglanfield.wordpress.com/2016/09/05/accepted-sheridan-animation-portfolio-2016/'],
+      ['terryibele.com','2018','Scored 95% with no prior formal training; recommends studying accepted portfolios and attending Sheridan\'s November open house for professor feedback.','https://terryibele.com/2018/11/09/accepted-sheridan-animation-portfolio/'],
+      ['"Accepted" portfolio walkthroughs on YouTube','2019–2026','Multiple real walkthroughs spanning several cycles, including an 87%-scoring 2026 portfolio.','https://www.youtube.com/results?search_query=accepted+sheridan+animation+portfolio'],
+      ['Quora (paraphrased)','undated','Consensus that the program is "competitive but attainable" — portfolio quality, not GPA, is the real differentiator; 10–20 strong pieces is roughly the right range.','https://www.quora.com/Is-it-hard-to-get-into-the-Sheridan-College-animation-program']
+    ],
+    verify:['The actual Fall 2027 portfolio deadline — not yet published as of this research.','3D Animation and Emerging Technologies\' specific portfolio requirements — also not yet published.']
+  },
+  {
+    id:'tfs', name:'Toronto Film School', sub:'private college, rolling intake — not on the Ontario college calendar', site:'https://www.torontofilmschool.ca',
+    flag:'TFS runs rolling, quarterly-ish intakes and the site only ever shows the single nearest upcoming start date — <b>January 2027</b> as of this research. Nobody could confirm a September 2027 start actually exists without calling admissions directly. Delivery mode is also unclear: official pages say "remote with live instruction," but other listings describe an in-person campus option.',
+    stats:[['Rolling','No fixed deadline'],['$150','Application fee'],['3 pieces','Minimum portfolio — lowest bar on this list'],['18 mo','Program length, 6 terms']],
+    programs:[
+      {
+        name:'Game Design and Animation Diploma', credential:'18-month diploma, 6 terms',
+        portfolio:['Minimum 3 original works — sketches, drawings, 3D models, digital art, animations, or game assets, any mix','Or a 2–3 page game design document (premise, mechanics, art direction, audience)','Or both','Plus a 100–300 word essay on interest in the field and career goals'],
+        portfolioNote:'By far the lowest bar on this list — a genuine safety net rather than a stretch target.',
+        academic:'OSSD or equivalent; no minimum entering average published. Graduating (not entering) requires a 1.7 GPA.',
+        curriculumSummary:'44 mandatory courses, no electives at all, run across four parallel tracks each term — Digital Drawing, Game Modeling, Game Design, and Texturing — converging into Concept Design, Character Modeling, Game Rigging, Art Direction, and Motion Capture, with a 5-part "Game Production Project" running the whole 18 months as a capstone spine. Finishes with two Career &amp; Portfolio Development courses and a final Capstone Project.',
+        terms:[
+          {label:'Term 1', courses:[['Digital Drawing 1','M','Digital-art software fundamentals — layers, brushes, colour theory, composition.'],['Game Modeling 1','M','3D modelling fundamentals for game assets.'],['Game Foundations','M','Core mechanics, balance, player psychology.'],['Video Game Production 1','M','The full production lifecycle, pre-production through release.'],['Game Engines 1','M','A beginner 2D engine — interactivity, assets.'],['Texturing 1','M','UV mapping, baking, bitmap vs. procedural textures.'],['Principles of Art & Design','M','Line, shape, form, colour applied to game visuals.'],['Game Production Project 1','M','Capstone series begins — pre-production and prototyping.']]},
+          {label:'Term 2', courses:[['Digital Drawing 2','M','Anatomy and perspective for dynamic art.'],['Game Modeling 2','M','Optimization, advanced texturing, intro rigging.'],['Game Design 1','M','Gameplay mechanics and player engagement.'],['Video Game Production 2','M','Post-production, QA, launch strategy.'],['Game Engines 2','M','Scripting, physics, particle systems.'],['Texturing 2','M','Procedural texturing and baking.'],['Game Animation 1','M','Keyframe animation, the 12 classic principles.'],['Game Production Project 2','M','Full-scale production planning.']]},
+          {label:'Term 3', courses:[['Concept Design 1','M','Original concept ideas for characters, environments, props.'],['Game Modeling 3','M','High-end workflows, advanced sculpting.'],['Game Design 2','M','Immersive mechanics and narrative integration.'],['Character Modeling 1','M','Anatomy, proportion, animation-ready character models.'],['Game Engines 3','M','Scripting, AI implementation, optimization.'],['Texturing 3','M','PBR and photorealism.'],['Game Animation 2','M','In-engine animation blending and facial animation.'],['Game Production Project 3','M','Agile production — sprints and milestones.']]},
+          {label:'Term 4', courses:[['Concept Design 2','M','Industry-complexity concept work, AI-assisted tools.'],['Level Design','M','Pacing, environmental storytelling, challenge balance.'],['Game Design 3','M','Player psychology, monetization, complex systems.'],['Character Modeling 2','M','High-resolution sculpting and rigging.'],['Game Engines 4','M','Physics, lighting, custom shaders.'],['Texturing 4','M','Platform-aware, AI-assisted texturing.'],['Game Animation 3','M','Procedural and physics-driven animation.'],['Game Production Project 4','M','Finalizing design and mechanics.']]},
+          {label:'Term 5', courses:[['Career and Portfolio Development 1','M','Resume, networking, digital branding.'],['Lighting & Rendering','M','Dynamic lighting, shadows, global illumination.'],['Game Design 4','M','Narrative design and world-building.'],['Game Rigging','M','Skeletal setup, skinning, facial rigging.'],['Programming with AI','M','Visual scripting and procedural content generation.'],['Art Direction for Games','M','Defining a game\'s overall visual identity.'],['Motion Capture','M','Mocap acquisition and processing.'],['Game Production Project 5','M','Integrating complex mechanics via supervised labs.']]},
+          {label:'Term 6', courses:[['Career and Portfolio Development 2','M','Personal branding, negotiation, job search.'],['Capstone Project','M','Final game or component, presented to an industry panel.']]}
+        ]
+      },
+      {name:'Game Development Diploma', credential:'18-month diploma — programming-focused sibling program', portfolio:['No portfolio — a Grade 12 math course (MHF4U, MCT4C, or MCV4U), or a 70%+ score on an in-house math assessment'], curriculumSummary:'36 mandatory courses: C/C++, data structures, game math and physics, Unity, Unreal Engine 5, AI programming, and networking, sharing the same 5-part Game Production Project capstone spine as the Animation diploma. A weaker fit for your stated interests, included as a reference point.'}
+    ],
+    sources:[
+      ['CourseCompare.ca','Oct 2025','4.6/5 across 34 reviews — though none visibly from Game Design & Animation students specifically.','https://www.coursecompare.ca/school/toronto-film-school/'],
+      ['OPlusReviews.ca','ongoing','Under 2/5 across every category — sharply conflicts with the CourseCompare figure above.','https://oplusreviews.ca/toronto-film-school/'],
+      ['Glassdoor (staff reviews)','undated','Harsh criticism of the sales-driven admissions process, from staff rather than students.','https://www.glassdoor.ca/Reviews/Toronto-Film-School-people-Reviews-EI_IE1916051.0,19_KH20,26.htm'],
+      ['filmschool.org forum thread','2011','An old thread showing this skepticism about for-profit film schools isn\'t new.','https://www.filmschool.org/threads/the-toronto-school-of-film.14176/']
+    ],
+    verify:['Whether a real September 2027 start exists at all.','Delivery mode — remote vs. in-person.','Whether any real portfolio deadline applies, or it\'s genuinely rolling.']
+  }
+  ];
+
+  /* ---------- render ---------- */
+  SCHOOLS.forEach(function(s){
+    var page = document.getElementById('page-'+s.id);
+    var html = '';
+    html += '<div class="schoolhead"><h2>'+s.name+'</h2><div class="meta">'+(s.sub?('<div>'+s.sub+'</div>'):'')+'<a href="'+s.site+'" target="_blank" rel="noopener">'+s.site.replace('https://','')+' ↗</a></div></div>';
+    html += '<div class="flag"><div class="eyebrow">Worth knowing</div>'+s.flag+'</div>';
+    if(s.stats){
+      html += '<div class="statgrid">'+s.stats.map(function(st){return '<div class="stat"><div class="v">'+st[0]+'</div><div class="k">'+st[1]+'</div></div>';}).join('')+'</div>';
+    }
+    html += '<div class="progtabs" role="tablist"></div>';
+    html += s.programs.map(function(p,i){
+      var pid = s.id+'-prog-'+i;
+      var inner = '<h3 style="font-size:1.3rem;margin-bottom:6px;">'+p.name+'</h3><p class="soft" style="margin-bottom:18px;">'+p.credential+'</p>';
+      if(p.portfolio){
+        inner += '<div class="eyebrow">Portfolio</div><ul style="padding-left:20px; margin-bottom:6px;">'+p.portfolio.map(function(x){return '<li style="margin-bottom:6px;">'+x+'</li>';}).join('')+'</ul>';
+        if(p.portfolioNote) inner += '<p class="soft" style="font-size:.88rem;">'+p.portfolioNote+'</p>';
+      }
+      if(p.academic){ inner += '<div class="eyebrow" style="margin-top:20px;">Academic</div><p>'+p.academic+'</p>'; }
+      if(p.curriculumSummary){
+        inner += '<div class="eyebrow" style="margin-top:20px;">Curriculum</div><p>'+p.curriculumSummary+'</p>';
+        if(p.curriculumNote) inner += '<p class="soft" style="font-size:.85rem;">'+p.curriculumNote+'</p>';
+      }
+      if(p.terms){
+        inner += '<details class="curric"><summary>Full term-by-term course list</summary>';
+        inner += p.terms.map(function(t){
+          var rows = t.courses.map(function(c){
+            return '<div class="courserow"><div class="cname">'+c[0]+' '+tagHtml(c[1])+'</div><div class="cdesc">'+c[2]+'</div></div>';
+          }).join('');
+          return '<div class="coursegroup"><h4>'+t.label+'</h4>'+rows+'</div>';
+        }).join('');
+        inner += '</details>';
+      }
+      return '<div class="progpanel'+(i===0?' active':'')+'" id="'+pid+'" data-prog="'+pid+'">'+inner+'</div>';
+    }).join('');
+    if(s.sources && s.sources.length){
+      html += '<div class="rule"></div><div class="eyebrow">What people who actually applied say</div>';
+      html += s.sources.map(function(src){
+        return '<div class="srcitem"><div class="plat">'+src[0]+' &middot; '+src[1]+'</div><p style="margin:4px 0 0;">'+src[2]+' <a href="'+src[3]+'" target="_blank" rel="noopener">source ↗</a></p></div>';
+      }).join('');
+    }
+    if(s.verify && s.verify.length){
+      html += '<div class="flag" style="margin-top:24px;"><div class="eyebrow">Call and confirm before relying on this</div><ul style="padding-left:20px; margin:8px 0 0;">'+s.verify.map(function(v){return '<li style="margin-bottom:6px;">'+v+'</li>';}).join('')+'</ul></div>';
+    }
+    page.innerHTML = html;
+
+    // wire program tabs
+    var tabbar = page.querySelector('.progtabs');
+    if(tabbar && s.programs.length>1){
+      s.programs.forEach(function(p,i){
+        var btn = document.createElement('button');
+        btn.textContent = p.name;
+        btn.setAttribute('aria-current', i===0?'true':'false');
+        btn.addEventListener('click', function(){
+          page.querySelectorAll('.progpanel').forEach(function(pp){pp.classList.remove('active');});
+          page.querySelectorAll('.progtabs button').forEach(function(bb){bb.setAttribute('aria-current','false');});
+          page.querySelector('#'+s.id+'-prog-'+i).classList.add('active');
+          btn.setAttribute('aria-current','true');
+        });
+        tabbar.appendChild(btn);
+      });
+    } else if(tabbar){ tabbar.style.display='none'; }
+  });
+
+})();
+</script>
